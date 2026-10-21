@@ -1,3 +1,4 @@
+pub const DISABLE_CLIENT_UPDATES: bool = true;
 use std::{
     collections::HashMap,
     future::Future,
@@ -1011,6 +1012,9 @@ pub fn is_modifier(evt: &KeyEvent) -> bool {
 }
 
 pub fn check_software_update() {
+        if DISABLE_CLIENT_UPDATES {
+            return;
+    }
     if is_custom_client() {
         return;
     }
@@ -1130,6 +1134,10 @@ fn process_software_update_check_response(bytes: Bytes) -> ResultType<()> {
 // Because the url is always `https://api.rustdesk.com/version/latest`.
 #[tokio::main(flavor = "current_thread")]
 pub async fn do_check_software_update() -> hbb_common::ResultType<()> {
+        if DISABLE_CLIENT_UPDATES {
+            clear_software_update_url();
+            return Ok(());
+    }
     let (request, url) =
         hbb_common::version_check_request(hbb_common::VER_TYPE_RUSTDESK_CLIENT.to_string());
     let proxy_conf = Config::get_socks();
